@@ -49,8 +49,6 @@ public class TestBankController {
     public void testGetAccountDetails(Long accountId) {
         Account mockAccount = new Account("INR", "John Doe", "HDFC");
         when(repoAccount.findById(accountId)).thenReturn(Optional.of(mockAccount));
-
-        bankController = new BankController();
         bankController.setRepo(this.repoAccount);
 
         Mono<Account> result = bankController.getAccountDetails(accountId);
@@ -66,8 +64,6 @@ public class TestBankController {
         Long accountId = 1L;
 
         when(repoAccount.findById(accountId)).thenReturn(Optional.empty());
-
-        bankController = new BankController();
         bankController.setRepo(this.repoAccount);
         assertThrows(NoAccountFoundException.class,()->{
             bankController.getAccountDetails(accountId).block();
