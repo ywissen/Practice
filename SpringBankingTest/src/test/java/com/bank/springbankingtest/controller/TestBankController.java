@@ -1,15 +1,21 @@
 package com.bank.springbankingtest.controller;
 
-import com.bank.springbankingtest.Exceptions.NoAccountFoundException;
-import com.bank.springbankingtest.model.Account;
-import com.bank.springbankingtest.model.Instruction;
-import com.bank.springbankingtest.model.PaymentInstruction;
-import com.bank.springbankingtest.repo.AccountRepo;
-import com.bank.springbankingtest.repo.InstructionRepo;
-import com.bank.springbankingtest.service.BankService;
+
+import com.bank.springbankingproject.Exceptions.NoAccountFoundException;
+import com.bank.springbankingproject.controller.BankController;
+import com.bank.springbankingproject.model.Account;
+import com.bank.springbankingproject.model.Instruction;
+import com.bank.springbankingproject.model.PaymentInstruction;
+import com.bank.springbankingproject.repo.AccountRepo;
+import com.bank.springbankingproject.repo.InstructionRepo;
+import com.bank.springbankingproject.service.BankService;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -17,6 +23,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.assertArg;
 import static org.mockito.Mockito.*;
 
+import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.OngoingStubbing;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -27,17 +35,19 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+@ExtendWith(MockitoExtension.class)
 public class TestBankController {
 
+    @Mock
     private static AccountRepo repoAccount;
 
+    @InjectMocks
     private static BankController bankController;
 
 
 
     @BeforeAll
     public static void setUp(){
-        repoAccount = mock(AccountRepo.class);
         bankController = new BankController();
 
     }
@@ -49,7 +59,6 @@ public class TestBankController {
     public void testGetAccountDetails(Long accountId) {
         Account mockAccount = new Account("INR", "John Doe", "HDFC");
         when(repoAccount.findById(accountId)).thenReturn(Optional.of(mockAccount));
-        bankController.setRepo(this.repoAccount);
 
         Mono<Account> result = bankController.getAccountDetails(accountId);
 
@@ -64,7 +73,6 @@ public class TestBankController {
         Long accountId = 1L;
 
         when(repoAccount.findById(accountId)).thenReturn(Optional.empty());
-        bankController.setRepo(this.repoAccount);
         assertThrows(NoAccountFoundException.class,()->{
             bankController.getAccountDetails(accountId).block();
         });
@@ -100,7 +108,6 @@ public class TestBankController {
 
     @AfterAll
     public static  void cleanUp(){
-        repoAccount = null;
         bankController=null;
     }
 }
