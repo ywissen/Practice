@@ -1,0 +1,61 @@
+Manager Table :
+
+CREATE TABLE Manager (
+    managerId INT PRIMARY KEY,
+    managerName VARCHAR(255) NOT NULL
+);
+
+INSERT INTO Manager (managerId, managerName) VALUES
+    (1, 'John Doe'),
+    (2, 'Jane Smith'),
+    (3, 'Bob Johnson');
+
+======================================
+
+Employe Table :
+
+CREATE TABLE Employee (
+    empId INT PRIMARY KEY,
+    empName VARCHAR(255) NOT NULL,
+    managerId INT,
+    salary DECIMAL(10, 2),
+    FOREIGN KEY (managerId) REFERENCES Manager(managerId)
+);
+
+INSERT INTO Employee (empId, empName, managerId, salary) VALUES
+    (101, 'Alice Johnson', 3, 60000.00),
+    (102, 'Bob Smith', 1, 75000.00),
+    (103, 'Charlie Brown', 2, 80000.00),
+    (104, 'David White', 2, 70000.00),
+    (105, 'Eva Black', 1, 85000.00),
+    (106, 'Frank Green', 3, 72000.00);
+
+==============================================
+
+Query to Find Employee Name and Manager Name:
+
+select Employee.empId,Employee.empName,Employee.salary,Manager.managerName 
+from Employee 
+left join Manager on Employee.managerId = Manager.managerId
+
+===============================================
+
+Write a query to find one emp from each department who is getting highest salary within his dept.
+
+SELECT empId, empName, salary
+FROM Employee
+ORDER BY salary DESC
+LIMIT 1;
+
+======================================================
+
+Write a query to delete duplicate rows from a table.
+
+DELETE e
+FROM Employee e
+LEFT JOIN (
+    SELECT empName, managerId, salary, MIN(empId) AS minEmpId
+    FROM Employee
+    GROUP BY empName, managerId, salary
+) AS subquery ON e.empName = subquery.empName AND e.managerId = subquery.managerId AND e.salary = subquery.salary
+WHERE e.empId IS NOT NULL AND e.empId <> subquery.minEmpId;
